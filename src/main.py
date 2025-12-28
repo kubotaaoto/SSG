@@ -1,17 +1,21 @@
 from textnode import TextNode, TextType
 import os
 import shutil
+import sys
 from generate_page import copy_static, generate_pages_recursive
 
 
 def main():
-    if os.path.exists("public"):
-        print("Deleting public directory...")
-        shutil.rmtree("public")
-    os.mkdir("public")
-    print("Copying static files to public directory...")
-    copy_static("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    if os.path.exists("docs"):
+        print("Deleting docs directory...")
+        shutil.rmtree("docs")
+    os.mkdir("docs")
+    print("Copying static files to docs directory...")
+    copy_static("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
     
 
 main()

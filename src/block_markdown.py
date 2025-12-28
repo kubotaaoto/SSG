@@ -84,7 +84,12 @@ def block_node_to_html_node(block_node):
             if text.startswith("###### "):
                 return ParentNode("h6", text_to_children(text[7:]))
         case BlockType.QUOTE:
-            return ParentNode("blockquote", text_to_children(text.replace("> ", "")))
+            lines = text.split("\n")
+            new_lines = []
+            for line in lines:
+                new_lines.append(line.lstrip(">").strip())
+            content = " ".join(new_lines)
+            return ParentNode("blockquote", text_to_children(content))
         case BlockType.CODE:
             text = text[4:-3]
             leafnode = text_node_to_html_node(TextNode(text, TextType.TEXT))
@@ -110,13 +115,3 @@ def list_block_to_list_html(list_type, text):
         for line in lines:
             children.append(ParentNode("li", text_to_children(line[3:])))
         return ParentNode("ol", children)
-
-def quote_block_to_quote_html(text):
-    lines = text.split("\n")
-    children = []
-    for line in lines:
-        if line[2:].strip() != "":
-            children.append(ParentNode("p", text_to_children(line[2:])))
-        else:
-            children.append(LeafNode(None, line[2:]))
-    return ParentNode("blockquote", children)

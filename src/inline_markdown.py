@@ -1,5 +1,12 @@
-from textnode import TextType, TextNode
+from textnode import TextType, TextNode, text_node_to_html_node
 import re
+
+def text_to_children(text):
+    textnodes = text_to_textnodes(text)
+    leafnodes = []
+    for textnode in textnodes:
+        leafnodes.append(text_node_to_html_node(textnode))
+    return leafnodes
 
 def text_to_textnodes(text):
     parent_textnode = TextNode(text, TextType.TEXT)

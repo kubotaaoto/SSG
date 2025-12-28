@@ -42,7 +42,7 @@ class ParentNode(HTMLNode):
         if not self.tag:
             raise ValueError("invalid parent node: no tag")
         if not self.children:
-            raise ValueError("invalid parent node: no children")
+            raise ValueError(f"invalid parent node: no children in {self}")
         
         sub_res = ""
         for child in self.children:         

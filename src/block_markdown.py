@@ -1,5 +1,5 @@
 from enum import Enum
-from htmlnode import ParentNode
+from htmlnode import LeafNode, ParentNode
 from inline_markdown import text_to_children
 from textnode import TextNode, TextType, text_node_to_html_node
 
@@ -72,19 +72,19 @@ def block_node_to_html_node(block_node):
             return ParentNode("p", text_to_children(paragraph))
         case BlockType.HEADING:
             if text.startswith("# "):
-                return ParentNode("h1", text_to_children(text))
+                return ParentNode("h1", text_to_children(text[2:]))
             if text.startswith("## "):
-                return ParentNode("h2", text_to_children(text))
+                return ParentNode("h2", text_to_children(text[3:]))
             if text.startswith("### "):
-                return ParentNode("h3", text_to_children(text))
+                return ParentNode("h3", text_to_children(text[4:]))
             if text.startswith("#### "):
-                return ParentNode("h4", text_to_children(text))
+                return ParentNode("h4", text_to_children(text[5:]))
             if text.startswith("##### "):
-                return ParentNode("h5", text_to_children(text))
+                return ParentNode("h5", text_to_children(text[6:]))
             if text.startswith("###### "):
-                return ParentNode("h6", text_to_children(text))
+                return ParentNode("h6", text_to_children(text[7:]))
         case BlockType.QUOTE:
-            return ParentNode("blockquote", text_to_children(text))
+            return ParentNode("blockquote", text_to_children(text.replace("> ", "")))
         case BlockType.CODE:
             text = text[4:-3]
             leafnode = text_node_to_html_node(TextNode(text, TextType.TEXT))
@@ -102,9 +102,21 @@ def list_block_to_list_html(list_type, text):
         raise ValueError(f"not a list type: {list_type}")
     lines = text.split("\n")
     children = []
-    for line in lines:
-        children.append(ParentNode("li", text_to_children(line)))
     if list_type == BlockType.ULIST:
+        for line in lines:
+            children.append(ParentNode("li", text_to_children(line[2:])))
         return ParentNode("ul", children)
-    return ParentNode("ol", children)
+    else:
+        for line in lines:
+            children.append(ParentNode("li", text_to_children(line[3:])))
+        return ParentNode("ol", children)
 
+def quote_block_to_quote_html(text):
+    lines = text.split("\n")
+    children = []
+    for line in lines:
+        if line[2:].strip() != "":
+            children.append(ParentNode("p", text_to_children(line[2:])))
+        else:
+            children.append(LeafNode(None, line[2:]))
+    return ParentNode("blockquote", children)
